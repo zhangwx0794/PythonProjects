@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Title</title>
+  <link href="../static/bootstrap-3.3.7-dist/css/table.css" rel="stylesheet" />
+  <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+</head>
+<body style="width: 80%;margin: 2% auto;">
+
+  <table class=table8_1>
+  <tr>
+    <th>序号</th>
+    <th>店铺名称</th>
+    <th>宝贝标题</th>
+    <th>关键词</th>
+    <th>旺旺号</th>
+    <th>订单号</th>
+    <th>客单价（元）</th>
+    <th>佣金（元）</th>
+    <th>经手人</th>
+    <th>日期</th>
+  </tr>
+    {% for row in res %}
+      <tr>
+        <td>{{ row[0] }}</td>
+        <td>{{ row[1] }}</td>
+        <td>{{ row[2] }}</td>
+        <td>{{ row[3] }}</td>
+        <td>{{ row[4] }}</td>
+        <td>{{ row[5] }}</td>
+        <td>{{ row[6] }}</td>
+        <td>{{ row[7] }}</td>
+        <td>{{ row[8] }}</td>
+        <td>{{ row[9] }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+    <p style="text-align: right;">
+      <a class="btn btn-primary btn-sm" href="/index?page=1" >首页</a>
+      <a class="btn btn-primary btn-sm" href="/index?page={{ last_page }}" >上一页</a>
+      <a class="btn btn-primary btn-sm" href="/index?page={{ next_page }}" >下一页</a>
+      <a class="btn btn-primary btn-sm" href="/index?page={{ max_page }}" >末页</a>
+    </p>
+</body>
+</html>

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>闻迪Plus</title>
+    <link href="../static/bootstrap-3.3.7-dist/css/table.css" rel="stylesheet"/>
+    <link href="../static/bootstrap-3.3.7-dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <script src="../static/bootstrap-3.3.7-dist/js/bootstrap.min.js"></script>
+</head>
+{#<body style="width: 80%;margin: 2% auto;">#}
+<body>
+<div style="margin: 20px 20px;">
+    <form action="/search" method="post" id="form">
+        <!-- 搜索框 -->
+        宝贝标题: &nbsp; <input class="input" type="text" name='goodsName' id='goodsName' width="10%"
+                            placeholder="请输入宝贝标题"/>
+        关键词 : &nbsp;<input type="text" name='goodsKey' id='goodsKey' width="10%" placeholder="请输入关键词"/>
+        旺旺ID : &nbsp; <input type="text" name='wangwangId' id='wangwangId' width="10%" placeholder="请输入旺旺ID"/>
+        订单号 : &nbsp; <input type="text" name='orderId' id='orderId' width="10%" placeholder="请输入订单号"/>
+        <p></p>
+        店铺名称: &nbsp; <input type="text" name='shopName' id='shopName' width="10%" placeholder="请输入店铺名称"/>
+        订单日期: &nbsp; <input type="text" name='date' id='date' width="10%" placeholder="请输入日期，例如: 2020-01-01"/>
+        经手人 : &nbsp; <input type="text" name='handlerName' id='handlerName' width="10%" placeholder="请输入经手人"/>
+        客户名 : &nbsp; <input type="text" name='custName' id='custName' width="10%" placeholder="请输入客户名称"/>
+        <input type="hidden" id="inputPageSize" name="pageSize"/>
+        <input type="hidden" id="inputUserUuid" name="userUuid"/>
+        <input type="hidden" id="inputRole" name="role"/>
+        <!-- 导出按钮， onclick事件绑定downloadStudentsExcel函数 -->
+        <input class="btn btn-primary btn-sm" type="button" onclick="doSubmit()" value="查询" style="text-align: right"/>
+        <input class="btn btn-primary btn-sm" style="background-color: #67b168" type="button" value="导出Excel" onclick="download_excel()">
+    </form>
+</div>
+<div style="margin: 10px 10px;">
+    <span style="color: #49afcd">实付金额总计（元）：{{ totalKdjPrice }}</span>
+    <span style="white-space: pre">          </span>
+    <span style="color: #5BB75B">佣金总计（元）：{{ totalYjPrice }}</span>
+    <span style="white-space: pre">          </span>
+    <span style="color: #FAA732">实付金额+佣金总计（元）：{{ totalKdjPrice+totalYjPrice }}</span>
+    {% if role == 9 %}
+        <span style="white-space: pre">          </span>
+        <span style="color: #DA4F49">实付金额+刷手佣金总计（元）：{{ totalKdjPrice+totalSsyj }}</span>
+        <span style="white-space: pre">          </span>
+        <span style="color: #0088CC">红包及其他总计（元）：{{ totalRedPackets }}</span>
+    {% endif %}
+</div>
+
+<div>
+    <p align="right">
+        <span>查询结果总数：{{ queryTotalCnt }}</span>
+        <span>
+            每页显示条数:
+            <select onchange="setPageSize(value)" id="pageSize">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="200">200</option>
+                <option value="500">500</option>
+            </select>
+        </span>
+        <a class="btn btn-primary btn-sm" onclick="toPage(1)">首页</a>
+        <a class="btn btn-primary btn-sm" onclick="toPage({{ lastPage }})">上一页</a>
+        <a class="btn btn-primary btn-sm" onclick="toPage({{ nextPage }})">下一页</a>
+        <a class="btn btn-primary btn-sm" onclick="toPage({{ maxPage }})">末页</a>
+    </p>
+</div>
+<div  class="table8_1">
+    <table>
+        <tr>
+            <th style="white-space: nowrap">序号</th>
+            <th style="white-space: nowrap">客户名</th>
+            <th style="white-space: nowrap">店铺名</th>
+            <th style="white-space: nowrap">宝贝标题</th>
+            <th style="white-space: nowrap">关键词</th>
+            <th style="white-space: nowrap">旺旺号</th>
+            <th style="white-space: nowrap">订单号</th>
+            <th style="white-space: nowrap">实付金额</th>
+            <th style="white-space: nowrap">佣金</th>
+            {% if role == 9 %}
+                <th style="white-space: nowrap">红包及其他</th>
+                <th style="white-space: nowrap">刷手佣金</th>
+                <th style="white-space: nowrap">经手人</th>
+                <th style="white-space: nowrap">操作微信号</th>
+            {% endif %}
+            <th style="white-space: nowrap">日期</th>
+        </tr>
+        {% for row in sqlRes %}
+            <tr>
+                <td style="white-space: nowrap">{{ row[0] }}</td>
+                <td style="white-space: nowrap">{{ row[12] }}</td>
+                <td style="white-space: nowrap">{{ row[1] }}</td>
+                <td style="white-space: nowrap">{{ row[2] }}</td>
+                <td style="white-space: nowrap">{{ row[3] }}</td>
+                <td style="white-space: nowrap">{{ row[4] }}</td>
+                <td style="white-space: nowrap">{{ row[5] }}</td>
+                <td style="white-space: nowrap">{{ row[6] }}</td>
+                <td style="white-space: nowrap">{{ row[7] }}</td>
+                {% if role == 9 %}
+                    <td style="white-space: nowrap">{{ row[8] }}</td>
+                    <td style="white-space: nowrap">{{ row[9] }}</td>
+                    <td style="white-space: nowrap">{{ row[10] }}</td>
+                    <td style="white-space: nowrap">{{ row[11] }}</td>
+                {% endif %}
+                <td style="white-space: nowrap">{{ row[13] }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>
+<script>
+    var pageSize = sessionStorage.getItem('pageSize');
+    var page = sessionStorage.getItem('page');
+    var userUuid = sessionStorage.getItem('userUuid');
+    var role = sessionStorage.getItem('role');
+    var goodsName = '{{ formParameters[0] }}';
+    var goodsKey = '{{ formParameters[1] }}';
+    var wangwangId = '{{ formParameters[2] }}';
+    var orderId = '{{ formParameters[3] }}';
+    var shopName = '{{ formParameters[4] }}';
+    var date = '{{ formParameters[5] }}';
+    var handlerName = '{{ formParameters[6] }}';
+    var custName = '{{ formParameters[7] }}';
+
+    function initVars() {
+        {#如果pageSize为空，则继续从url变量中获取page值，否则赋值为10#}
+        if (!pageSize) {
+            {#如果url中没有pageSize值，则把pageSize赋值为10并存入sessionStorage中#}
+            if (!getQueryString('pageSize')) {
+                pageSize = 10;
+            } else {
+                pageSize = getQueryString('pageSize');
+            }
+            sessionStorage.setItem('pageSize', pageSize);
+        }
+
+        {#如果page为空，则继续从url变量中获取page值，否则page赋值为1#}
+        if (!page) {
+            {#如果url中没有page值，则把page赋值为1并存入sessionStorage中#}
+            if (!getQueryString('page')) {
+                page = 1;
+            } else {
+                page = getQueryString('page');
+            }
+            sessionStorage.setItem('page', page);
+        }
+
+        {#如果userUuid为空，则userUuid赋值为空#}
+        if (!userUuid) {
+            {#如果url中没有userUuid值，则把userUuid赋值为空并存入sessionStorage中#}
+            if (!getQueryString('uuid')) {
+                userUuid = '';
+            } else {
+                userUuid = getQueryString('uuid');
+            }
+            sessionStorage.setItem('userUuid', userUuid);
+        }
+
+        {#如果role为空，则role赋值为0#}
+        if (!role) {
+            {#如果url中没有userUuid值，则把userUuid赋值为空并存入sessionStorage中#}
+            if (!getQueryString('role')) {
+                role = 0;
+            } else {
+                role = getQueryString('role');
+            }
+            sessionStorage.setItem('role', role);
+        }
+    }
+
+    initVars();
+
+    {#input变量初始化#}
+
+    function setInputVars() {
+        document.getElementById('pageSize').value = pageSize;
+        document.getElementById('inputUserUuid').value = userUuid;
+        document.getElementById('inputRole').value = role;
+    }
+
+    setInputVars();
+
+    /**获取URL参数**/
+    function getQueryString(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) {
+            return unescape(r[2]);
+        }
+        return null;
+    }
+
+    {#切换每页显示数量时页面刷新#}
+
+    function setPageSize(size) {
+        pageSize = size;
+        sessionStorage.setItem('pageSize', pageSize);
+        if (page == null) {
+            page = 1;
+        }
+        window.location.href = '/search?page=' + page + '&pageSize=' + pageSize + '&uuid=' + userUuid;
+    }
+
+    function toPage(page) {
+        window.location.href = '/search?page=' + page + '&pageSize=' + pageSize + '&uuid=' + userUuid;
+    }
+
+    function doSubmit() {
+        document.getElementById('inputPageSize').value = pageSize;
+        document.getElementById('inputUserUuid').value = userUuid;
+        document.getElementById('inputRole').value = role;
+        document.getElementById('form').submit();
+    }
+
+    // 定义点击下载事件函数
+    function download_excel() {
+        // 假设后台下载Excel的路由是 /search/downloadExcel
+        var fmPms = '&goodsName='+goodsName+'&goodsKey='+goodsKey+'&wangwangId='+ wangwangId+'&orderId='+ orderId+'&shopName='+shopName +'&date='+ date+'&handlerName='+ handlerName+'&custName='+custName;
+        window.open("/search/downloadExcel"+"?uuid="+userUuid+fmPms);
+    }
+</script>
